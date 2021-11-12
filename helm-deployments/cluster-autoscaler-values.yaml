@@ -1,0 +1,19 @@
+nodeSelector: {
+    "node.kubernetes.io/lifecycle": "on-demand"
+  }
+
+autoDiscovery:
+  clusterName: "my-eks-cluster"
+
+awsRegion: "us-west-2"
+
+rbac:
+  serviceAccount:
+    name: "cluster-autoscaler-aws"
+    annotations:
+      "eks.amazonaws.com/role-arn":  "arn:aws:iam::364736210010:role/cluster-autoscaler"
+
+extraArgs:
+  "balance-similar-node-groups": "true"
+  "skip-nodes-with-local-storage": "false"
+  "skip-nodes-with-system-pods": "false"

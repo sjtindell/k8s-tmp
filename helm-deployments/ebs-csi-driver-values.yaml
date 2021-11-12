@@ -1,0 +1,11 @@
+image:
+  repository: "602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-ebs-csi-driver"
+
+controller:
+  serviceAccount:
+    create: "true"
+    name: "ebs-csi-driver-aws"
+    annoations:
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::364736210010:role/ebs-csi-driver-aws"
+  extraVolumeTags:
+    "project": "techops"

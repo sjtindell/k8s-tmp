@@ -1,0 +1,19 @@
+nodeSelector: {
+  "node.kubernetes.io/lifecycle": "on-demand"
+}
+
+awsRegion: "us-west-2"
+
+serviceAccount:
+  name: "aws-node-termination-handler"
+
+rbac:
+  serviceAccount:
+    annoations:
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::364736210010:role/instance_refresh20211027074714202000000002"
+
+enableSqsTerminationDraining: "true"
+
+enableSpotInterruptionDraining: "true"
+
+queueURL: "https://sqs.us-west-2.amazonaws.com/364736210010/instance_refresh"

@@ -1,0 +1,19 @@
+agentCollector:
+  enabled: true
+standaloneCollector:
+  enabled: false
+
+config:
+  exporters:
+    otlp:
+      endpoint: "tempo.tempo.svc.cluster.local:4317"
+
+  service:
+    pipelines:
+      metrics: null
+      logs: null
+      traces:
+        processors:
+          - batch
+        exporters:
+          - otlp

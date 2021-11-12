@@ -1,0 +1,30 @@
+deployment:
+  replicas: 2
+
+nodeSelector:
+  "node.kubernetes.io/lifecycle": "on-demand"
+
+podAnnotations:
+  "prometheus.io/scrape": "true"
+  "prometheus.io/port": "http-metrics"
+
+podDisruptionBudget:
+  enabled: "true"
+  maxUnavailable: 1
+
+service:
+  type: NodePort
+
+globalArguments: ""
+
+# alb health-check 200 on target-port
+additionalArguments:
+  - "--ping.entrypoint=web"
+
+ports:
+  traefik:
+    healthchecksPort: 8000 # web
+  web:
+    nodePort: 32080
+  websecure:
+    expose: false

@@ -1,0 +1,71 @@
+server:
+  datasource:
+    url: "http://vmsingle-victoria-metrics-single-server"
+  config:
+    alerts:
+      groups:
+      # custom
+      - name: k8s
+        rules:
+        - alert: KubernetesNodeReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 5m
+          labels:
+            alert_level: high
+            alert_type: state
+            alert_source_type: k8s
+          annotations:
+            summary: "Kubernetes Node ready (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.node }} has been unready for a long time\n VALUE = {{ $value }}\n LABELS: {{ $labels }}"
+        - alert: KubernetesMemoryPressure
+          expr: kube_node_status_condition{condition="MemoryPressure",status="true"} == 1
+          for: 5m
+          labels:
+            alert_level: middle
+            alert_type: mem
+            alert_source_type: k8s
+          annotations:
+            summary: "Kubernetes memory pressure (instance {{ $labels.instance }})"
+            description: "{{ $labels.node }} has MemoryPressure condition\n VALUE = {{ $value }}\n LABELS: {{ $labels }}"
+        - alert: KubernetesPodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total[15m]) * 60 * 5 > 5
+          for: 5m
+          labels:
+            alert_level: middle
+            alert_type: state
+            alert_source_type: k8s
+          annotations:
+            summary: "Kubernetes pod crash looping (instance {{ $labels.instance }})"
+            description: "Pod {{ $labels.pod }} is crash looping\n VALUE = {{ $value }}\n LABELS: {{ $labels }}"
+      - name: pod
+        rules:
+          - alert: ContainerMemoryUsage
+            expr: (sum(container_memory_working_set_bytes) BY (instance, name) / sum(container_spec_memory_limit_bytes > 0) BY (instance, name) * 100) > 80
+            for: 5m
+            labels:
+              alert_level: middle
+              alert_type: mem
+              alert_source_type: pod
+            annotations:
+              summary: "Container Memory usage (instance {{ $labels.instance }})"
+              description: "Container Memory usage is above 80%\n VALUE = {{ $value }}\n LABELS: {{ $labels }}"
+        
+notifier:
+  alertmanager:
+    url: "http://vmalert-alertmanager"
+
+alertmanager:
+  enabled: "true"
+  config:
+    global:
+      slack_api_url: '<slack_webhook_url>'
+
+    route:
+      receiver: 'slack-notifications'
+      group_by: [alertname, datacenter, app]
+
+    receivers:
+    - name: 'slack-notifications'
+      slack_configs:
+      - channel: '#alerts'
+        text: 'https://internal.myorg.net/wiki/alerts/{{ .GroupLabels.app }}/{{ .GroupLabels.alertname }}'

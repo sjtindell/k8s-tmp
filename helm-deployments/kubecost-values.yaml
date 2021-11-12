@@ -1,0 +1,32 @@
+kubecostToken: "aGVsbUBrdWJlY29zdC5jb20=xm343yadf98"
+
+global:
+  prometheus:
+    enabled: false
+    fqdn: "http://vmsingle-victoria-metrics-single-server.victoria-metrics.svc.cluster.local:8428"
+
+  grafana:
+    enabled: false
+    domainName: "grafana.grafana.svc.cluster.local"
+
+persistentVolume:
+  enabled: true
+  size: "8Gi"
+  dbSize: "8.0Gi"
+
+prometheus:
+  kube-state-metrics:
+    disabled: true
+
+serviceAccount:
+  annotations:
+    "eks.amazonaws.com/role-arn": "arn:aws:iam::364736210010:role/kubecost_cost_analyzer"
+
+kubecostProductConfigs:
+  clusterName: "eks01"
+  spotLabel: "node.kubernetes.io/lifecycle"
+  spotLabelValue: "spot"
+  awsSpotDataRegion: "us-west-2"
+  awsSpotDataBucket: "kubecost-cost-analyzer-uw2"
+  awsSpotDataPrefix: "kubecost-uw2"
+  projectID: 364736210010 # aws account

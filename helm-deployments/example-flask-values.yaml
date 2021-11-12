@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-flask-deployment
+  labels:
+    app: example-flask
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-flask
+  template:
+    metadata:
+      labels:
+        app: example-flask
+      annotations:
+        prometheus.io/scrape: "true"
+        "prometheus.io/port": "5000"
+    spec:
+      containers:
+        - name: example-flask
+          image: 364736210010.dkr.ecr.us-west-2.amazonaws.com/example-flask:latest
+          ports:
+          - containerPort: 5000
+          env:
+          - name: SECRET_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysealedsecret
+                key: password
+
+---
+
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: mysealedsecret
+  namespace: default
+spec:
+  encryptedData:
+    password: AgAi72voKV4fAuk2wyQw+a53kOo8L9Qqnf1ZupBX3XrX1+31VtMCcctkIwqLlvsU+CiqVQ+mnIWIZ4GDGtH5uiBnwWqbmX+IFz1ZeJdP6+Hi53Z8Y4RYx7wYKHPVNc/UnCvTyBwpbK8Ug+Lr5bTzqZm/gN43ATbe5w35i2+17L6/lYJoaPRrTeKYuFPcs77aY+uM9erDe3qxWGwuqiID5uUdurCICVAeRUr+jBubAYntODJPZuOaPbbFO4klDrfkOueQLqYxelL3q/IoKwdmH9oqA0YeONxDGNPWWC4Av+ngBSQDE9L4pg+sUIORtTOf79C7eqZ29uC9KHlrAtnxGNHkC/Os4tNuvuYTHuB2yknBSkn+k7pUX4wz8nwPbw0IiLVy396QhgNKihR4G2+Kg8vMqTFVg6UJ5PovWAIL7XFX7JdW6z1g3zGiicMUrkyHF5H9YZJnw99/IUCKsXCLOuzOU+aC1XA3mjXa0PejhPePjLvu7f2SPben35pjBV5RanbGddW6PIgepLpbU1Mq9sD5vOP0NLGOKJKLQGLRpL8hCZsDmvOKUYnG/b/wNNzHaBMqAnmIV49LMjk2kqs2wCr3sSiThqm4GJt27jsIj5FVtio5A6piE7kOj1fTkKKRqsie+l1DW+TQSXZAvRG7J1saQaA2vzdBQwa5oG2wcGmQe5ES9DNfCWxCsvuguG+TEwUUT07/N2kpx38=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: mysealedsecret
+      namespace: default

@@ -1,0 +1,10 @@
+nodeSelector:
+  "node.kubernetes.io/lifecycle": "on-demand"
+
+podAnnotations:
+  "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+  "prometheus.io/scrape": "true"
+  "prometheus.io/port": "3100"
+
+persistence:
+  enabled: true

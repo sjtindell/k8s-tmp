@@ -1,0 +1,31 @@
+server:
+  
+  nodeSelector:
+    "node.kubernetes.io/lifecycle": "on-demand"
+
+  podAnnotations:
+    "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+
+
+  scrape:
+    enabled: true
+
+    extraScrapeConfigs:
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'node-exporter-prometheus-node-exporter'
+          action: keep
+      - job_name: kubecost
+        honor_labels: true
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        metrics_path: /metrics
+        scheme: http
+        dns_sd_configs:
+        - names:
+          - kubecost-cost-analyzer.kube-system
+          type: 'A'
+          port: 9003

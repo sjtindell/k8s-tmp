@@ -1,0 +1,3 @@
+prometheus:
+  url: "http://vmsingle-victoria-metrics-single-server"
+  port: 8428

@@ -1,0 +1,75 @@
+env:
+  GF_AUTH_ANONYMOUS_ENABLED: true
+  GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
+  GF_AUTH_DISABLE_LOGIN_FORM: true
+
+nodeSelector: {
+    "node.kubernetes.io/lifecycle": "on-demand"
+  }
+
+persistence:
+  enabled: true
+
+plugins:
+  - grafana-piechart-panel
+
+datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: victoriametrics
+          type: prometheus
+          orgId: 1
+          url: http://vmsingle-victoria-metrics-single-server.victoria-metrics.svc.cluster.local:8428
+          access: proxy
+          isDefault: true
+          updateIntervalSeconds: 10
+          editable: true
+        - name: loki
+          type: loki
+          orgId: 1
+          url: http://loki.loki.svc.cluster.local:3100
+          access: proxy
+          #basicAuth: false
+          isDefault: false
+          version: 1
+          editable: true
+          apiVersion: 1
+        - name: tempo
+          type: tempo
+          access: proxy
+          orgId: 1
+          url: http://tempo.tempo.svc.cluster.local:3100
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: true
+          apiVersion: 1
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: true
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    victoriametrics:
+      gnetId: 10229
+      revision: 20
+      datasource: victoriametrics
+    kubernetes:
+      gnetId: 14205
+      revision: 1
+      datasource: victoriametrics
+    node_exporter:
+      gnetId: 1860
+      revision: 23
+      datasource: victoriametrics
